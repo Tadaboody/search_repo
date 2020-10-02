@@ -1,10 +1,13 @@
 import argparse
 import asyncio
 import enum
+import os
 import sys
 import typing
 
 import aiohttp
+
+USE_HTTPS_VARIABLE = "SEARCH_REPO_USE_HTTPS"
 
 
 class Repository(typing.NamedTuple):
@@ -12,20 +15,12 @@ class Repository(typing.NamedTuple):
     author: str
     stars: int
     provider: str
-    fork: bool
 
-    class UrlForm(enum.Enum):
-        SSH = "ssh"
-        HTTPS = "http"
-        SHORTENED = "shortened"
-
-    def get_link(self, form: "Repository.UrlForm") -> str:
+    def to_link(self, https: bool) -> str:
         full_name = f"{self.author}/{self.name}"
-        return {
-            self.UrlForm.SSH: f"git@{self.provider}:{full_name}",
-            self.UrlForm.HTTPS: f"https://{self.provider}/{full_name}",
-            self.UrlForm.SHORTENED: f"{self.provider}:{full_name}",
-        }[form]
+        if https:
+            return f"https://{self.provider}/{full_name}"
+        return f"git@{self.provider}:{full_name}"
 
     @classmethod
     def from_github_json(cls, json: typing.Dict):
@@ -34,7 +29,6 @@ class Repository(typing.NamedTuple):
             author=json["owner"]["login"],
             stars=int(json["stargazers_count"]),
             provider="github.com",
-            fork=json["fork"],
         )
 
 
@@ -57,12 +51,12 @@ def parse_args(argv: typing.List[str]) -> argparse.Namespace:
     parser.add_argument("name")
     parser.add_argument(
         "--language",
-        help="Programming language to filter by",
+        help="Programming language to filter by.",
     )
     parser.add_argument(
-        "--form",
-        choices=[form.name.lower() for form in Repository.UrlForm],
-        default="ssh",
+        "--https",
+        action="store_true",
+        help=f"Output an http clone link, can also be toggled by defining {USE_HTTPS_VARIABLE}",
     )
     return parser.parse_args(argv[1:])
 
@@ -74,7 +68,7 @@ def main():
         print("No repos match the query", file=sys.stderr)
         return 1
     best_match = max(repos, key=lambda repo: repo.stars)
-    print(best_match.get_link(Repository.UrlForm[args.form.upper()]))
+    print(best_match.to_link(https=args.https or (USE_HTTPS_VARIABLE in os.environ)))
     return 0
 
 
