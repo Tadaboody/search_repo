@@ -1,6 +1,6 @@
 # Search Repo 
 ## Finds the most relevant repo in the command line
-[![PyPI version](https://badge.fury.io/py/search-repo.svg)](https://badge.fury.io/py/search-repo) [![Downloads](https://pepy.tech/badge/black)](https://pepy.tech/project/black) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![PyPI version](https://badge.fury.io/py/search-repo.svg)](https://badge.fury.io/py/search-repo) [![Downloads](https://pepy.tech/badge/search-repo)](https://pepy.tech/project/black) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 ---
 
 ### Installation 

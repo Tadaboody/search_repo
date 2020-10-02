@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "search_repo"
-version = "0.2.0"
+version = "0.2.1"
 description = "Search for a github repo"
 authors = ["Tomer Keren <tomer.keren.dev@gmail.com>"]
 license = "MIT"
