@@ -38,22 +38,27 @@ class Repository(typing.NamedTuple):
         )
 
 
-async def get_repo(repo_name: str) -> Repository:
+async def get_repo(repo_name: str, language: str) -> typing.List[Repository]:
     async with aiohttp.ClientSession() as session:
         async with session.get(
             "https://api.github.com/search/repositories",
-            params={"q": repo_name, "sort": "stars", "order": "desc"},
+            params={
+                "q": f"{repo_name} language:{language}",
+                "sort": "stars",
+                "order": "desc",
+            },
         ) as resp:
             github_response = await resp.json()
-    github_repos: typing.List[Repository] = [
-        Repository.from_github_json(json) for json in github_response["items"]
-    ]
-    return max(github_repos, key=lambda repo: repo.stars)
+    return [Repository.from_github_json(json) for json in github_response["items"]]
 
 
 def parse_args(argv: typing.List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Find the most matching repository")
     parser.add_argument("name")
+    parser.add_argument(
+        "--language",
+        help="Programming language to filter by",
+    )
     parser.add_argument(
         "--form",
         choices=[form.name.lower() for form in Repository.UrlForm],
@@ -64,8 +69,13 @@ def parse_args(argv: typing.List[str]) -> argparse.Namespace:
 
 def main():
     args = parse_args(sys.argv)
-    res = asyncio.run(get_repo(args.name))
-    print(res.get_link(Repository.UrlForm[args.form.upper()]))
+    repos = asyncio.run(get_repo(args.name, args.language))
+    if not repos:
+        print("No repos match the query", file=sys.stderr)
+        return 1
+    best_match = max(repos, key=lambda repo: repo.stars)
+    print(best_match.get_link(Repository.UrlForm[args.form.upper()]))
+    return 0
 
 
 if __name__ == "__main__":
