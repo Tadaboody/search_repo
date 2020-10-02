@@ -41,7 +41,7 @@ class Repository(typing.NamedTuple):
 async def get_repo(repo_name: str) -> Repository:
     async with aiohttp.ClientSession() as session:
         async with session.get(
-            "https://api.github.com/search/repositories?q=cppcoro&sort=stars&order=desc",
+            "https://api.github.com/search/repositories",
             params={"q": repo_name, "sort": "stars", "order": "desc"},
         ) as resp:
             github_response = await resp.json()
