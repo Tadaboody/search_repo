@@ -15,13 +15,16 @@ class Repository(typing.NamedTuple):
     fork: bool
 
     class UrlForm(enum.Enum):
-        SHORTENED = "SHORTENED"
-        SSH = "SSH"
+        SSH = "ssh"
+        HTTPS = "http"
+        SHORTENED = "shortened"
 
     def get_link(self, form: "Repository.UrlForm") -> str:
+        full_name = f"{self.author}/{self.name}"
         return {
-            self.UrlForm.SSH: f"git@{self.provider}:{self.author}/{self.name}",
-            self.UrlForm.SHORTENED: f"{self.provider}:{self.author}/{self.name}",
+            self.UrlForm.SSH: f"git@{self.provider}:{full_name}",
+            self.UrlForm.HTTPS: f"https://{self.provider}/{full_name}",
+            self.UrlForm.SHORTENED: f"{self.provider}:{full_name}",
         }[form]
 
     @classmethod
