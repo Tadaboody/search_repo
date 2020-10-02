@@ -5,7 +5,7 @@
 ```bash
 $ search_repo cppcoro
 git@github.com:lewissbaker/cppcoro
-$ git clone (search_repo cppcoro)
+$ git clone $(search_repo cppcoro)
 Cloning into 'cppcoro'...
 remote: Enumerating objects: 15, done.
 remote: Counting objects: 100% (15/15), done.
